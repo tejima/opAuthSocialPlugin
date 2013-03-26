@@ -26,6 +26,7 @@ class opAuthAdapterSocial extends opAuthAdapter
   }
   public function authenticate()
   {
+    sfContext::getInstance()->getLogger()->debug('authenticate()');
     $result = parent::authenticate();
 
     //Your Site Settings
@@ -56,9 +57,11 @@ class opAuthAdapterSocial extends opAuthAdapter
     //Error
     if ($result_json === false)
     {
+      sfContext::getInstance()->getLogger()->debug('$result_json is FALSE');
       //You may want to implement your custom error handling here
-      echo 'Curl error: ' . curl_error($curl). '<br />';
-      echo 'Curl info: ' . curl_getinfo($curl). '<br />';
+      sfContext::getInstance()->getLogger()->debug(curl_error($curl));
+      sfContext::getInstance()->getLogger()->debug(curl_getinfo($curl));
+
       curl_close($curl);
       throw new Exception("Exception: auth server error");
     }
@@ -67,13 +70,19 @@ class opAuthAdapterSocial extends opAuthAdapter
  
     //Decode
     $json = json_decode ($result_json);
+    sfContext::getInstance()->getLogger()->debug(print_r($json,true));
+
  
     //Extract data
-    $data = $json->response->result->data;
+    $data = $json->response->result->data; 
+    
+      sfContext::getInstance()->getLogger()->debug(print_r($data->user->identity,true));
+
  
     //Check for plugin
     if ($data->plugin->key != 'social_login' || $data->plugin->data->status != 'success')
     {
+
       throw new Exception("Exception: auth server error");  
     }
     //The token of the user that signed in/up using his social network account
@@ -89,8 +98,10 @@ class opAuthAdapterSocial extends opAuthAdapter
       // Insert you proprietary account creation code here.
       //echo "create user";
       // 2.1.2] Attach the user_token to the userID of the created account.
+
       $member = Doctrine::getTable('Member')->createPre();
-      $member->setName("NoName");
+      $member->setName($data->user->identity->displayName);
+      $member->setConfig("pc_address",$data->user->identity->emails[0]->value);
       $member->setIsActive(true);
       $member->save();
       $user_id = $member->id;
@@ -104,8 +115,6 @@ class opAuthAdapterSocial extends opAuthAdapter
       $member_id = $user_id;
       var_dump($user_id);
       $member = Doctrine::getTable('Member')->find($member_id);
-      echo "MEMBER";
-      print_r($member->id);
     }
     $result = $member->getId();
 
@@ -160,8 +169,6 @@ class opAuthAdapterSocial extends opAuthAdapter
   }
   private function LinkUserTokenToUserId($user_token,$user_id){
     $m = Doctrine::getTable("Member")->find($user_id);
-    //echo $user_id;
-    //echo $m->name;
     if($m){
       $m->setConfig("oneall",$user_token);    
       sfContext::getInstance()->getLogger()->debug("user_token:" . $user_token);
