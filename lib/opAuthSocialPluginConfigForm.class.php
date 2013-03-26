@@ -3,8 +3,8 @@ class opAuthSocialPluginConfigForm extends sfForm
 {
   protected $configs = array(
     'cqc.jp.oneall_subdomain' => 'cqc.jp.oneall_subdomain',
-    'cqc.jp.oneall_public_key' => 'cqc.jp.public_key',
-    'cqc.jp.oneall_private_key' => 'cqc.jp.private_key'
+    'cqc.jp.oneall_public_key' => 'cqc.jp.oneall_public_key',
+    'cqc.jp.oneall_private_key' => 'cqc.jp.oneall_private_key'
   );
   public function configure()
   {
