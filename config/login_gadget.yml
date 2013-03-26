@@ -1,0 +1,7 @@
+socialForm:
+  caption:
+    ja_JP: "ソーシャルログイン"
+  description:
+    ja_JP: "ソーシャルログイン専用のログインフォームです"
+  viewable_privilege: 4
+  component: [oneall, oneallBox]
