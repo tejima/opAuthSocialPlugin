@@ -104,6 +104,16 @@ class opAuthAdapterSocial extends opAuthAdapter
       $member->setConfig("pc_address",$data->user->identity->emails[0]->value);
       $member->setIsActive(true);
       $member->save();
+
+      $communities = Doctrine::getTable('Community')->getDefaultCommunities();
+      if($communities)
+      {
+        foreach ($communities as $community)
+        {
+          Doctrine::getTable('CommunityMember')->join($member->id, $community->getId());
+        }
+      }
+
       $user_id = $member->id;
       $this->LinkUserTokenToUserId ($user_token, $user_id);
     }
